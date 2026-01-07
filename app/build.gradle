@@ -1,0 +1,32 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.ZhongYeZi.SpoofTitle'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.ZhongYeZi.SpoofTitle"
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    compileOnly fileTree(dir: 'libs/compile_only', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
