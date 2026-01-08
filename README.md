@@ -7,6 +7,14 @@
 本模块会拦截 `WindowManager` 的 `addView` 和 `updateViewLayout` 方法，根据当前设备的 ROM 类型，将目标应用的窗口标题 (`LayoutParams.setTitle`) 强制修改为系统录屏软件的特有标识
 
 这使得作用域内的应用在被录制时，会被误以为是系统自带的录屏悬浮窗，从而被过滤掉
+## 版本说明
+
+### v1.1
+新增隐藏任务栈
+
+### v1.0
+伪装窗口标题，移除窗口FLAG_SECURE
+
 
 ## 使用方法
 

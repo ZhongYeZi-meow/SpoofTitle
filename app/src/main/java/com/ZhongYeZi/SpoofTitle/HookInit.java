@@ -11,6 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.os.Build;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -38,6 +42,35 @@ public class HookInit implements IXposedHookLoadPackage {
         if (lpparam.packageName == null) return;
             hookWindowManager(lpparam.classLoader, true);
             hookSecureFlag(lpparam.classLoader);
+            hookActivityRecents(lpparam.classLoader);
+    }
+
+    private void hookActivityRecents(ClassLoader classLoader) {
+        try {
+            XposedHelpers.findAndHookMethod(Activity.class, "onCreate", android.os.Bundle.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Activity activity = (Activity) param.thisObject;
+                    ActivityManager am = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
+                    if (am != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        List<ActivityManager.AppTask> tasks = am.getAppTasks();
+                        if (tasks != null) {
+                            for (ActivityManager.AppTask task : tasks) {
+                                try {
+                                    if (task.getTaskInfo().id == activity.getTaskId()) {
+                                        task.setExcludeFromRecents(true);
+                                    }
+                                } catch (Throwable t) {
+                                    // 忽略异常
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (Throwable t) {
+            XposedBridge.log("SpoofTitle: Hook Activity Recents 失败: " + t.getMessage());
+        }
     }
 
     private void hookSecureFlag(ClassLoader classLoader) {
